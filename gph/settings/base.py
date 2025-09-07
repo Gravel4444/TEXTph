@@ -136,9 +136,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
-LANGUAGE_CODE = 'en-us' #FIXME
+LANGUAGE_CODE = 'ko-KR' #FIXME
 
-TIME_ZONE = 'America/New_York' #FIXME
+TIME_ZONE = 'Asia/Seoul' #FIXME
 
 USE_I18N = True
 
@@ -158,6 +158,7 @@ SOLUTION_STATIC_ROOT = os.path.normpath(os.path.join(BASE_DIR, 'puzzles/template
 STATICFILES_STORAGE = 'gph.storage.CustomStorage'
 
 # Email SMTP information
+# 퍼즐헌트 사이트에서 이메일 보낼 때 사용할 정보.
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'FIXME'

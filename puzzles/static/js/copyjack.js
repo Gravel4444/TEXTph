@@ -178,7 +178,9 @@ function bootstrapClipboardButton(clipboardButton) {
       },
       node => {
         if (node.nodeType !== Node.ELEMENT_NODE) return;
-
+        
+        // 여기에 font-size를 10pt로 설정하는 코드를 추가합니다.
+        node.style.fontSize = '10pt';
 
         if (node.dataset.copyOnlyStyles) {
           node.setAttribute(
@@ -213,6 +215,11 @@ function bootstrapClipboardButton(clipboardButton) {
     }
 
     const plainTextVersion = trimPlainText(cloned.innerText);
+
+    // '+'로 시작하는 모든 줄 앞에 "'"를 붙여 스프레드시트 에러를 방지합니다. (이 줄 추가)
+    // const spreadsheetSafeText = plainTextVersion.replace(/^\+/gm, "'+");
+    // 다음 if에 plainTextVersion 대신 spreadsheetSfateText 사용.
+
     if (!plainTextVersion) {
       document.querySelector(".clipboard-button span").innerText = gettext('Nothing was copied');
     }

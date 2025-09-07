@@ -10,11 +10,12 @@
 
 <table class="puzzles-list">
 {% for round in rounds.values %}
-    <tbody>
+<!-- <tbody>
         <th colspan="4">
             <h1><a href="{% url 'round' round.round.slug %}">{{ round.round.name }}</a></h1>
         </th>
     </tbody>
+     -->
     {% include 'puzzles_list.html' with round=round %}
 {% endfor %}
 </table>

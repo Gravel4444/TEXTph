@@ -1,12 +1,12 @@
 html {
-    --page-bg-rgb: 5, 5, 5;
-    --accent-bg-rgb: 40, 26, 33;
-    --accent-rgb: 237, 242, 243;
-    --dark-accent-rgb: 13, 4, 26;
-    --body-rgb: 221, 221, 215;
-    --dark-flair-rgb: 67, 38, 117;
-    --flair-rgb: 159, 122, 234;
-    --light-flair-rgb: 192, 168, 240;
+    --page-bg-rgb: 255, 249, 249; /* 원래 240, 242, 245 */
+    --accent-bg-rgb: 244, 255, 244;
+    --accent-rgb: 0, 0, 0;
+    --dark-accent-rgb: 207, 58, 36;
+    --body-rgb: 0, 0, 0;
+    --dark-flair-rgb: 0, 255, 255;
+    --flair-rgb: 255, 193, 204;
+    --light-flair-rgb: 255, 0, 0;
 
     --white-color: #f9f8f5;
     --neutral-color: #bbbcc3;
@@ -28,10 +28,10 @@ html {
     --print-border-color: #111;
 
     --link-text-color: var(--accent-color);
-    --link-hover-color: #b794f4;
+    --link-hover-color: #0645AD;
 
     --btn-text-color: var(--accent-color);
-    --btn-bg-color: rgba(var(--dark-flair-rgb), 0.8);
+    --btn-bg-color: transparent;
     --btn-bg-2-color: rgba(var(--accent-bg-rgb), 0.8);
     --btn-hover-color: rgba(var(--flair-rgb), 0.7);
 
@@ -40,24 +40,26 @@ html {
     --info-bg-color: rgba(var(--page-bg-rgb), 0.8);
     --dropdown-bg-color: rgba(var(--accent-bg-rgb), 0.9);
 
-    --text-font: sans-serif;
-    --btn-font: sans-serif;
-    --input-font: monospace;
-    --answer-font: monospace;
+    --text-font: 'NanumSquareNeoBold';
+    --btn-font: 'NanumSquareNeoExtraBold';
+    --input-font: 'NanumSquareNeoBold' ;
+    --answer-font: 'NanumSquareNeoBold';
+    --accent-font: 'NanumSquareNeoExtraBold'; /* <-- 이 줄 추가 */
 }
 
 body {
     font-family: var(--text-font);
     font-variant-ligatures: none;
-    line-height: 2.6rem;
-    font-size: 1.75rem;
+    line-height: 3rem;
+    font-size: 2rem;
     overflow-wrap: break-word;
     position: relative;
     color: var(--body-text-color);
+    /*font-weight: 900;*/
 }
 
 strong {
-    text-shadow: 0 0 10px var(--glow-color);
+    text-shadow: 0 0 10px var(--glow-color); /*강조 표시 글자 뒤 빛나는거*/
 }
 
 @media print {
@@ -97,7 +99,7 @@ textarea {
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--accent-font);
     font-weight: bold;
-    text-shadow: 0 0 10px var(--glow-color);
+    /* text-shadow: 0 0 10px var(--glow-color); */
 
     letter-spacing: 0.02em;
     word-spacing: 0.1em;
@@ -105,13 +107,26 @@ h1, h2, h3, h4, h5, h6 {
 
 h1, h2 {
     margin-top: 2.5rem;
-    margin-bottom: 4rem;
-    font-size: 4rem;
+    margin-bottom: 15px; /* 여백 조정 */
+    font-size: 4rem;   /* 폰트 크기 살짝 조정 */
     line-height: 1.2;
+    /* padding-bottom: 15px; 구분선과 글자 사이 여백 */
+    /* border-bottom: 1px solid #e9ecef; /* 연한 회색 구분선 */
 }
 
 main {
     position: relative;
+    background-color: #ffffff;
+    padding: 30px 40px 20px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-top: 30px; /* 상단 메뉴와의 간격 */
+    border: 1px solid #333333
+}
+
+/* 메인 콘텐츠 영역 안의 링크 스타일을 별도로 지정합니다. */
+main a {
+    text-decoration: none; /* 밑줄을 확실하게 제거합니다. */
 }
 
 hr {
@@ -167,9 +182,9 @@ a, .btn {
 
 form .btn {
     padding: 0 24px;
-    height: 48px;
-    line-height: 48px;
-    font-size: 3rem;
+    height: 60px;
+    line-height: 30px;
+    font-size: 2rem;
 }
 
 input[type=text], input[type=password], input[type=email] {
@@ -243,27 +258,33 @@ a.main-content-anchor {
     }
 
     h1, h2 {
-        text-transform: uppercase;
+        /* text-transform: uppercase; */
     }
 
-    h3, h4 {
+    h4 {
         border-bottom: 2px solid var(--border-color);
         font-weight: normal;
     }
-
-    a {
-        transition: color 0.3s;
+    h3 {
+        border-top: 1px solid var(--border-color);
+        font-weight: normal;
+        font-size: 2.5rem;
     }
 
+
+    a {
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    /*포인터 올릴 때 하이라이트 색상*/
     a:hover,
     a:focus {
-        color: var(--link-hover-color);
-        text-shadow: 0 0 10px #b794f4aa;
+        text-shadow: none;
+        opacity: 1;
     }
 
     .puzzle-main {
-        background-color: var(--primary-900);
-        padding: 20px 30px;
+        /*그냥 main으로 코드 옮김*/
     }
 
     .puzzle-main h1, .puzzle-main h2, .puzzle-main h3, .puzzle-main h4 {
@@ -272,12 +293,16 @@ a.main-content-anchor {
         padding: 0;
     }
 
+    /*버튼 색상*/
     .btn {
         position: relative;
         transition: background-color 0.3s;
 
         color: var(--btn-text-color);
-        background-image: linear-gradient(1deg, var(--btn-bg-color), var(--btn-bg-2-color));
+        /* background-image: linear-gradient(1deg, var(--btn-bg-color), var(--btn-bg-2-color)); */
+        border: 5px solid #333333; /* 2px 두께의 검은색 테두리 */
+        padding: 2px 8px          ;/* 안쪽 여백 조정 */
+        line-height: 1.5;          /* 줄 높이 조정 */
 
 
     }
@@ -286,6 +311,7 @@ a.main-content-anchor {
     .btn:focus {
         color: var(--btn-text-color);
         background-color: var(--btn-hover-color);
+        opacity: 1;
     }
 
     .btn.danger {
@@ -313,26 +339,29 @@ a.main-content-anchor {
         white-space: nowrap;
         justify-content: space-between;
         font-size: 2rem;
-        margin: 0 0 1.5rem 0;
+        margin: 0 0 4rem 0;
         padding-bottom: 4px;
         line-height: 1;
-        background-color: var(--info-bg-color);
         font-family: var(--accent-font);
-        text-transform: uppercase;
-        backdrop-filter: blur(0.5em);
+        /* text-transform: uppercase; */
+        background-color: #ffffff; /* 불투명한 흰색 배경 */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 얇은 그림자 */
+        border-bottom: 1px solid #eeeeee; /* 매우 연한 하단 테두리 */
+        backdrop-filter: blur(0.5em); /* 블러 효과 제거 ?? 할거면 none 쓰기*/
     }
 
     .top-tabs a {
         display: inline-flex;
         position: relative;
-        padding: 6px 20px;
+        padding: 12px 20px;
         text-decoration: none;
         align-items: center;
     }
 
     .top-tabs .selected-tab {
         font-weight: bold;
-        text-shadow: 0 0 10px var(--glow-color);
+        color: #a40000; /* 선택된 탭 글자색 */
+        box-shadow: inset 0 -3px 0 #a40000; /* 안쪽 그림자로 하단 테두리 효과 */
     }
 
     .top-more-actions {
@@ -692,10 +721,13 @@ a.main-content-anchor {
 }
 
 .flavor {
-    margin-left: 22.5%;
-    margin-right: 22.5%;
-    text-align: center;
+    margin-left: 5%;
+    margin-right: 5%;
+    /* 원래는 둘 다 22.5% 였음 */
+    text-align: left;
     font-style: italic;
+    font-size: 1.75rem;
+    color: #444444;
 }
 
 .errorlist {
@@ -715,12 +747,12 @@ a.main-content-anchor {
 }
 
 .solved-title-marker {
-    font-size: 50%;
+    font-size: 2rem;
     color: var(--body-text-color);
 }
 
 .solved-title-answer {
-    color: #4a2;
+    color: #44883c;
     font-family: var(--answer-font);
 }
 
@@ -790,7 +822,9 @@ a.main-content-anchor {
 
 .puzzles-list {
     font-size: 2.4rem;
-    width: 100%;
+    max-width: 900px; /* 전체 너비를 800px로 제한 (이 값을 조절하세요) */
+    margin-left: auto; /* 자동 여백으로 중앙 정렬 */
+    margin-right: auto; /* 자동 여백으로 중앙 정렬 */
 }
 
 .puzzles-list a {
@@ -820,12 +854,18 @@ a.main-content-anchor {
 }
 
 .puzzles-list td:first-child {
-    width: 3rem;
+    width: 10rem;
     text-align: right;
-    font-weight: bold;
+    vertical-align: top; /* 내용 위쪽 정렬 */
 }
 
-.puzzles-list td:nth-child(3) {
+.puzzles-list td:nth-child(2) {
+    text-align: left; /* 리스트에서 퍼즐 제목 정렬 */
+    min-width: 70px;
+    padding-left: 1ch;
+} 
+
+.puzzles-list td:nth-child(4) {
     width: 0;
     white-space: nowrap;
 }
@@ -836,15 +876,21 @@ a.main-content-anchor {
 
 .puzzles-answer {
     width: 20ch;
-    max-width: 30vw;
+    max-width: 300px;
+    text-align: left; /* 텍스트를 오른쪽으로 정렬 */
 }
 
 .puzzles-answer > :first-child {
     border-bottom: 2px solid var(--border-color);
     font-family: var(--answer-font);
     font-weight: bold;
+    font-size: 2rem; /* 4. 정답 글자 크기 조정 (2.4rem의 80% = 1.92rem) */
+    color: #44883c;      /* 5. 정답 글자색을 초록색으로 변경 / #28a745 */
+
 }
 
+/*
+원본 puzzles-new
 .puzzles-new {
     display: inline-block;
     font-size: 1.5rem;
@@ -867,6 +913,26 @@ a.main-content-anchor {
         background-color: var(--btn-hover-color);
     }
 }
+*/
+
+.puzzles-new {
+    display: inline-block;
+    font-size: 1.5rem; /* 1. 글자 크기 키움 (2.4rem의 60% = 1.44rem) */
+    padding: 1px 10px; /* 2. 좌우 여백을 늘려 버튼을 넓게 만듦 */
+    margin-right: 0.4rem;
+    vertical-align: middle;
+    font-family: var(--accent-font);
+    text-transform: uppercase;
+    border-radius: 6px;
+    font-weight: bold;
+    background-color: #e7eaf3; /* 3. 이 값을 수정해 배경색 변경 */
+    color: #284f9c;      /* 3. 이 값을 수정해 글씨색 변경 */
+    transition: background-color 0.3s;
+}
+
+a:hover .puzzles-new {
+    background-color: #dbe0ef; /* 마우스 올렸을 때 살짝 진하게 */
+}
 
 .puzzles-inner {
     font-size: 1.8rem;
@@ -879,7 +945,7 @@ a.main-content-anchor {
 @media screen {
     .spoiler.solved-title-answer {
         display: inline-block;
-        min-width: 200px;
+        min-width: 150px;
         text-align: left;
     }
 
@@ -897,7 +963,7 @@ a.main-content-anchor {
     border-radius: 50%;
     bottom: 1.5em;
     box-shadow: .1em .1em .5em var(--info-bg-color);
-    font-size: 2em;
+    font-size: 1.5em;
     height: 2.25em;
     position: fixed !important;
     right: 1.5em;
@@ -913,8 +979,8 @@ a.main-content-anchor {
 
 @media screen {
     time[title] {
-        text-decoration: underline dotted;
-        text-underline-position: under;
+        /* text-decoration: underline dotted;
+        text-underline-position: under; */
         cursor: help;
     }
 }
@@ -957,11 +1023,22 @@ kbd {
 footer {
     text-align: center;
     opacity: 0.5;
-    font-size: 80%;
+    font-size: 1.2rem;
+    margin-top: 1rem; /* 이 값을 조절해 위쪽 여백을 설정하세요 */
+}
+
+footer a {
+    text-decoration: none; /* 링크의 밑줄을 제거합니다 */
 }
 
 @media print {
     footer {
         display: none;
     }
+}
+
+/* 문제 용도의 회전 텍스트 클래스 */
+.rotated-text {
+    display: inline-block;
+    transform: rotate(180deg);
 }

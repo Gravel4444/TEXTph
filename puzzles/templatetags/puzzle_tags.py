@@ -8,6 +8,7 @@ from django.template.base import NodeList
 from django.template.loader_tags import BlockNode
 from django.utils import timezone
 from django.utils import formats
+from django.utils import dateformat #추가함
 from django.utils.translation import gettext as _
 from django.utils.html import strip_spaces_between_tags
 from django.utils.safestring import mark_safe
@@ -45,13 +46,27 @@ def unix_time(timestamp):
     return timestamp.timestamp() if timestamp else ''
 
 @register.simple_tag
-def format_time(timestamp, format='DATE_TIME'):
+def format_time(timestamp, format='DATE_AT_TIME_FORMAT'):
     if not timestamp:
         return ''
-    timestamp2 = timestamp.astimezone(timezone.get_default_timezone())
-    text = formats.date_format(timestamp2, format=format)
+    
+    # settings.py에 설정된 시간대(Asia/Seoul)로 시간을 올바르게 변환합니다.
+    local_time = timezone.localtime(timestamp)
+    
+    # Django의 표준 로컬라이제이션 기능(formats.py)을 사용하는 dateformat.format 함수로 변경합니다.
+    text = dateformat.format(local_time, formats.get_format(format, use_l10n=True))
+    
     return mark_safe('<time datetime="%s" data-format="%s">%s</time>'
-        % (timestamp.isoformat(), formats.get_format(format), text))
+        % (timestamp.isoformat(), formats.get_format(format, use_l10n=True), text))
+
+# @register.simple_tag
+# def format_time(timestamp, format='DATE_TIME'):
+#     if not timestamp:
+#         return ''
+#     timestamp2 = timestamp.astimezone(timezone.get_default_timezone())
+#     text = formats.date_format(timestamp2, format=format)
+#     return mark_safe('<time datetime="%s" data-format="%s">%s</time>'
+#         % (timestamp.isoformat(), formats.get_format(format), text))
 
 @register.simple_tag
 def percentage(a, b):
