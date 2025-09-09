@@ -23,6 +23,8 @@ from django.contrib.auth import views as auth_views
 from django.views.i18n import JavaScriptCatalog
 from django.views.decorators.cache import cache_page
 
+from django.http import HttpResponse # ### 1. 이 라인을 추가해 주세요.
+
 from puzzles import puzzlehandlers
 from puzzles import views
 
@@ -36,6 +38,11 @@ class QuotedStringConverter:
         return quote(value, safe='')
 
 register_converter(QuotedStringConverter, 'quotedstr')
+
+# ### 2. 헬스체크 함수를 여기에 정의합니다.
+def healthcheck(request):
+    '''fly.io의 헬스체크에 응답하기 위한 간단한 뷰'''
+    return HttpResponse("OK", status=200)
 
 urlpatterns = [
     re_path(r'^admin/', admin.site.urls),
@@ -109,5 +116,8 @@ urlpatterns = [
     # see https://docs.djangoproject.com/en/4.0/topics/i18n/translation/#note-on-performance
     path('jsi18n/', cache_page(86400, key_prefix='js18n-V1')
         (JavaScriptCatalog.as_view()), name='javascript-catalog'),
+    
+    # ### 3. views.healthcheck가 아닌 그냥 healthcheck를 가리키도록 수정합니다.
+    path('healthcheck', healthcheck, name='healthcheck'),
 
 ]

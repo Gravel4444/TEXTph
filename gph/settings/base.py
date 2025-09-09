@@ -69,24 +69,52 @@ MIDDLEWARE = [
     'puzzles.views.accept_ranges_middleware',
 ]
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
-    }
-}
+# ===============================================================
+# 캐시 및 채널 레이어 설정 (환경별 분기 처리)
+# ===============================================================
+REDIS_URL = os.environ.get('REDIS_URL')
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [{'address':('127.0.0.1', 6379), 'db': 2}],
-        },
+if REDIS_URL:
+    # --- 배포 환경 (Fly.io) 설정 ---
+    # REDIS_URL 환경 변수가 존재할 경우, 해당 URL을 사용해 Redis에 연결합니다.
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": REDIS_URL + "/1",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            },
+        }
     }
-}
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [REDIS_URL + "/2"],
+            },
+        }
+    }
+else:
+    # --- 로컬 개발 환경 설정 ---
+    # REDIS_URL 환경 변수가 없을 경우, 기존과 같이 로컬(127.0.0.1) Redis를 사용합니다.
+    # 이렇게 하면 로컬 개발 환경이 깨지지 않습니다.
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://127.0.0.1:6379/1",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            },
+        }
+    }
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [{'address':('127.0.0.1', 6379), 'db': 2}],
+            },
+        }
+    }
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_CACHE_ALIAS = 'default'
@@ -185,6 +213,7 @@ EMAIL_SUBJECT_PREFIX = '[FIXME Puzzle Hunt] '
 #     'stream': sys.stdout,
 #     'formatter': 'django',
 # },
+# gph/settings/base.py
 
 LOGGING = {
     'version': 1,
@@ -197,52 +226,38 @@ LOGGING = {
             'format': '%(asctime)s (PID %(process)d) [%(levelname)s] %(name)s %(message)s'
         },
     },
-    # FIXME you may want to change the filenames to something like
-    # /srv/logs/django.log or similar
     'handlers': {
-        'django': {
+        # Django의 일반 로그를 위한 콘솔 핸들러
+        'console_django': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(LOGS_DIR, 'django.log'),
+            'class': 'logging.StreamHandler',
             'formatter': 'django',
         },
-        'general': {
+        # puzzles 앱의 로그를 위한 콘솔 핸들러
+        'console_puzzles': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(LOGS_DIR, 'general.log'),
-            'formatter': 'puzzles',
-        },
-        'puzzle': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(LOGS_DIR, 'puzzle.log'),
-            'formatter': 'puzzles',
-        },
-        'request': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(LOGS_DIR, 'request.log'),
+            'class': 'logging.StreamHandler',
             'formatter': 'puzzles',
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['django'],
+            'handlers': ['console_django'], # 파일 핸들러 대신 콘솔 핸들러 사용
             'level': 'INFO',
             'propagate': True,
         },
         'puzzles': {
-            'handlers': ['general'],
+            'handlers': ['console_puzzles'], # 파일 핸들러 대신 콘솔 핸들러 사용
             'level': 'INFO',
             'propagate': True,
         },
         'puzzles.puzzle': {
-            'handlers': ['puzzle'],
+            'handlers': ['console_puzzles'], # 파일 핸들러 대신 콘솔 핸들러 사용
             'level': 'INFO',
             'propagate': False,
         },
         'puzzles.request': {
-            'handlers': ['request'],
+            'handlers': ['console_puzzles'], # 파일 핸들러 대신 콘솔 핸들러 사용
             'level': 'INFO',
             'propagate': False,
         },

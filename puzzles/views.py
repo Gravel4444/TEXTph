@@ -1502,3 +1502,8 @@ def accept_ranges_middleware(get_response):
         response['Accept-Ranges'] = 'bytes'
         return response
     return process_request
+
+def healthcheck(request):
+    """Fly.io의 헬스 체크를 위한 간단한 뷰"""
+    return HttpResponse("OK", status=200)
+

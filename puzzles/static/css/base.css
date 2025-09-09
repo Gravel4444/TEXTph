@@ -13,7 +13,8 @@ html {
     --dark-text-color: rgba(var(--dark-accent-rgb), 0.9);
     --subtle-text-color: rgba(var(--dark-accent-rgb), 0.5);
     --body-text-color: rgba(var(--body-rgb), 0.9);
-    --glow-color: rgba(var(--accent-rgb), 0.4);
+    --glow-color: #be0000;
+    /* --glow-color: rgba(var(--accent-rgb), 0.4); */
 
     --accent-color: rgb(var(--accent-rgb));
     --accent-bg-color: rgba(var(--accent-rgb), 0.1);
@@ -59,7 +60,7 @@ body {
 }
 
 strong {
-    text-shadow: 0 0 10px var(--glow-color); /*강조 표시 글자 뒤 빛나는거*/
+    text-shadow: 0 0 1.5px var(--glow-color); /*강조 표시 글자 뒤 빛나는거*/
 }
 
 @media print {

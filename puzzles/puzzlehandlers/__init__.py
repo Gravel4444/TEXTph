@@ -7,7 +7,6 @@ from django.views.decorators.http import require_POST
 from ratelimit.decorators import ratelimit
 from ratelimit.utils import get_usage_count
 
-
 # django-ratelimit needs to see REMOTE_ADDR for user_or_ip to work for
 # logged-out people
 def reverse_proxy_middleware(get_response):
