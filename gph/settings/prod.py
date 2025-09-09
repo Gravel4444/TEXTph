@@ -18,7 +18,11 @@ DOMAIN = 'https://koreapuzzlehunt.fly.dev'
 
 # ALLOWED_HOSTS: Heroku가 사용하는 도메인을 허용합니다.
 # 나중에는 ['your-app-name.herokuapp.com'] 처럼 특정 도메인만 지정하는 것이 더 안전합니다.
-ALLOWED_HOSTS = ['koreapuzzlehunt.fly.dev']
+ALLOWED_HOSTS = [
+    'koreapuzzlehunt.fly.dev',
+    'localhost',  # 내부 테스트 및 디버깅용
+]
+
 
 # Fly.io 환경 변수에서 앱 이름을 가져와 .fly.dev 도메인 추가
 APP_NAME = os.environ.get('FLY_APP_NAME')

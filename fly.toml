@@ -4,11 +4,6 @@
 app = 'koreapuzzlehunt'
 primary_region = 'nrt'
 
-[build]
-  builder = "paketobuildpacks/builder:base"
-  [build.args]
-    BP_CPYTHON_VERSION = "3.11.4"
-
 [deploy]
   release_command = "sh -c 'python manage.py collectstatic --noinput && python manage.py migrate'"
 
