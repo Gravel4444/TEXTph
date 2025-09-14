@@ -11,7 +11,7 @@
 {% if modify_info_available %}
 <a href="{% url 'edit-team' %}" class="btn">{% translate "Edit team members" %}</a>
 <a href="{% url 'password_change' %}" class="btn">{% translate "Change password" %}</a>
-{% if not hunt_is_over %}
+<!-- {% if not hunt_is_over %}
 <a href="javascript:toggleTimeUnlocks()" class="btn">
     {% if team.allow_time_unlocks %}
     {% translate "Disable time unlocks" %}
@@ -36,7 +36,7 @@ Note that this means you may see fewer puzzles than if you were logged out. Also
     {% endif %}
 }
 </script>
-{% endif %}
+{% endif %} -->
 {% endif %}
 {% endblock %}
 
@@ -45,7 +45,7 @@ Note that this means you may see fewer puzzles than if you were logged out. Also
 <style>
 main {
     display: flex;
-    gap: 2.5em;
+    gap: 0em;
     flex-direction: column;
 }
 
@@ -70,23 +70,25 @@ main {
 <h1>{{ view_team.team_name }}</h1>
 
 <main>
+    <h4>팀원</h4>
     {% for team_member in view_team.teammember_set.all %}
     {{ team_member.name }}{% if forloop.revcounter != 1 %}, {% endif %}
     {% endfor %}
     {% if submissions|length %}
     {% if view_info_available or hunt_is_over %}
+    <br><br>
     <table class="sortable list-table">
-        <col style="width: 40%">
-        <col style="width: 10%">
-        <col style="width: 20%">
-        <col style="width: 10%">
-        <col style="width: 20%">
+        <col style="width: 35%">
+        <col style="width: 15%">
+        <col style="width: 18%">
+        <col style="width: 14%">
+        <col style="width: 18%">
         <tr>
             <th>{% translate "Puzzle" %}</th>
             <th>{% translate "Incorrect guesses" %}</th>
-            <th>{% translate "Unlock time" %} ({{ start_time|date:"T" }})</th>
+            <th>{% translate "Unlock time" %}</th>
             <th>{% translate "Time to solve" %}</th>
-            <th>{% translate "Solve time" %} ({{ start_time|date:"T" }})</th>
+            <th>{% translate "Solve time" %}</th>
         </tr>
         {% for s in submissions %}
         <tr{% if s.submission.used_free_answer %} class="free"{% endif %}>

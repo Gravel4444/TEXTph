@@ -387,7 +387,9 @@ class Team(models.Model):
         return self.total_hints_awarded + sum(HINTS_PER_INTERVAL[:intervals])
 
     def num_hints_used(self):
-        return sum(hint.consumes_hint for hint in self.asked_hints)
+        # <힌트 수정> 끝에 canned hint 사용량 추가. 아래는 원본
+        # return sum(hint.consumes_hint for hint in self.asked_hints)
+        return sum(hint.consumes_hint for hint in self.asked_hints)*2 + self.num_canned_hints_used
 
     def num_hints_remaining(self):
         return self.num_hints_total - self.num_hints_used
@@ -401,6 +403,10 @@ class Team(models.Model):
 
     def num_nonintro_hints_remaining(self):
         return self.num_hints_remaining - self.num_intro_hints_remaining
+    
+# <힌트 수정> canned hint 함수 추가함
+    def num_canned_hints_used(self):
+        return self.cannedhint_set.count()
 
     def num_free_answers_total(self):
         if not FREE_ANSWERS_ENABLED or self.hunt_is_over:
@@ -798,7 +804,7 @@ class Survey(models.Model):
             if isinstance(field, RatingField)
         ]
 
-
+# 힌트 관련 수정 필요
 class Hint(models.Model):
     '''A request for a hint.'''
 
@@ -856,6 +862,7 @@ class Hint(models.Model):
             o = o + ' {}'.format(self.get_status_display())
         return o
 
+# 힌트 관련 수정 필요 없이 따로 2 곱하는 로직 추가
     @property
     def consumes_hint(self):
         if self.status == Hint.REFUNDED:
@@ -865,6 +872,12 @@ class Hint(models.Model):
         if self.is_followup:
             return False
         return True
+
+# 고정형 힌트 사용량으로 추가함.
+# <힌트수정> 필요 없음.
+    # @property
+    # def consumes_check_hint(self):
+    #     return 1
 
     def recipients(self):
         if self.notify_emails == 'all':
@@ -899,7 +912,6 @@ class Hint(models.Model):
             settings.DOMAIN + 'hints?puzzle=%s' % self.puzzle_id,
         )
 
-
 @receiver(post_save, sender=Hint)
 def notify_on_hint_update(sender, instance, created, update_fields, **kwargs):
     # The .save() calls when updating certain Hint fields pass update_fields
@@ -923,3 +935,24 @@ def notify_on_hint_update(sender, instance, created, update_fields, **kwargs):
                 {'hint': instance, 'link': link},
                 instance.recipients())
             show_hint_notification(instance)
+
+# <힌트 수정>
+# CannedHint 모델을 새로 추가합니다.
+# 어떤 팀이, 어떤 퍼즐의, 어떤 고정 힌트를 열었는지 기록하는 역할을 합니다.
+class CannedHint(models.Model):
+    '''A record of a team unlocking a specific canned hint.'''
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name=_('team'))
+    puzzle = models.ForeignKey(Puzzle, on_delete=models.CASCADE, verbose_name=_('puzzle'))
+    # HTML 템플릿에 정의될 각 힌트의 고유 ID입니다.
+    hint_id = models.CharField(max_length=255, verbose_name=_('Hint ID'))
+    opened_datetime = models.DateTimeField(auto_now_add=True, verbose_name=_('opened datetime'))
+
+    class Meta:
+        # 한 팀이 같은 힌트를 여러 번 열 수 없도록 제약조건을 추가합니다.
+        unique_together = ('team', 'puzzle', 'hint_id')
+        verbose_name = _('canned hint unlock')
+        verbose_name_plural = _('canned hint unlocks')
+
+    def __str__(self):
+        return f'{self.team} unlocked "{self.hint_id}" for {self.puzzle}'
+    

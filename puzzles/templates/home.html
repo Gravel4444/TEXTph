@@ -83,6 +83,7 @@
             {% blocktranslate %}The hunt began on {{ hunt_start }}, and ended on {{ hunt_end }}.{% endblocktranslate %}
             {% else %}
             {% days_between start_time end_time as num_days %}
+                       
             {% blocktranslate %}The hunt will begin on {{ hunt_start }}, and it will end {{ num_days }} days later on {{ hunt_end }}.{% endblocktranslate %}
             {% endif %}
         </div>
@@ -110,8 +111,18 @@
 <div class="register">
     <a href="{% url 'register' %}" class="btn">{% translate "Register your team!" %}</a>
 </div>
+<!-- 이건 무슨 용도의 코드지
 <h3 class="print-register">
     <a>{% translate "Register at" %} https://FIXME</a>
 </h3>
+-->
+{% endif %}
+<!-- 아래 if문에는 조건이 더 들어가야 합니다. 1) 헌트 종료 전 2) 팀으로 로그인함 3) '시작하기' 버튼을 누르기 전. -->
+{% if not hunt_is_closed and request.user.is_authenticated %}
+<div class="register">
+    <!-- 이 아래의 '시작하기 버튼을 누르면 팀의 헌트가 시작됩니다.' -->
+    <a class="btn">‼️시작하기‼️</a>
+</div>
+
 {% endif %}
 {% endblock %}
