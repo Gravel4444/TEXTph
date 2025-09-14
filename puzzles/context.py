@@ -110,6 +110,11 @@ class BaseContext:
 
     def hunt_is_closed(self):
         return self.now >= self.close_time
+    
+    # <시간 수정> 아래 함수를 새로 추가합니다.
+    # 팀이 존재하고, 그 팀의 시작 시간이 설정되어 있으면 True를 반환합니다.
+    def team_has_started(self):
+        return self.team and self.team.team_start_time
 
 # Also include the constants from hunt_config.
 for (key, value) in hunt_config.__dict__.items():

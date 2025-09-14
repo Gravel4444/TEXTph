@@ -169,7 +169,7 @@
                         {% translate "Story" %}
                     </a>
                     {% endif %}
-                    {% if hunt_has_started or hunt_has_almost_started %}
+                    {% if team_has_started or hunt_is_closed %}
                     <a{% if '/puzzle' in request.path or puzzle %} class="selected-tab"{% endif %} href="{% url 'puzzles' %}">
                         {% translate "Puzzles" %}
                     </a>

@@ -164,7 +164,50 @@ def require_before_hunt_closed_or_admin(request):
 
 @require_GET
 def index(request):
-    return render(request, 'home.html')
+    can_start_hunt = False
+    
+    # 팀으로 로그인한 경우에만 로직을 실행합니다.
+    if request.context.team:
+        # 1. 팀의 시작 시간이 아직 없고 (not ...hunt_start_time)
+        # 2. 전체 헌트가 시작되었으며 (hunt_has_started)
+        # 3. 전체 헌트가 종료되지 않았을 때만 (not ...hunt_is_closed)
+        # 위 세 가지 조건을 모두 만족할 때만 can_start_hunt를 True로 설정합니다.
+        if not request.context.team.team_start_time and \
+           request.context.hunt_has_started and \
+           not request.context.hunt_is_closed:
+            can_start_hunt = True
+
+    # 계산된 결과를 템플릿으로 전달합니다.
+    return render(request, 'home.html', {
+        'can_start_hunt': can_start_hunt,
+    })
+
+# <시간 수정> 팀이 "!!시작하기!!" 버튼을 눌렀을 때 요청을 처리할 새로운 뷰를 추가합니다.
+@require_POST
+@require_before_hunt_closed_or_admin
+def start_hunt(request):
+    team = request.context.team
+    # 비정상적인 접근(로그인하지 않았거나 팀이 없는 경우)을 처리합니다.
+    if not team:
+        messages.error(request, _('퍼즐헌트 시작을 위해서는 팀으로 로그인해야 합니다. 등록해주세요!'))
+        return redirect('index')
+
+    # 이미 헌트를 시작한 팀이 다시 요청하는 경우를 처리합니다.
+    if team.team_start_time:
+        messages.warning(request, _('이미 퍼즐헌트를 시작했습니다. 새로고침 해보세요.'))
+        return redirect('puzzles')
+
+    # 전체 헌트가 시작되기 전에 시작을 시도하는 경우를 처리합니다.
+    if not request.context.hunt_has_started:
+        messages.error(request, _('아직 퍼즐헌트가 시작되지 않았습니다! 조금만 더 기다려주세요.'))
+        return redirect('index')
+
+    # 팀의 헌트 시작 시간을 현재 시간으로 기록하고 데이터베이스에 저장합니다.
+    team.team_start_time = request.context.now
+    team.save()
+    messages.success(request, _('📝 텍스트 퍼즐헌트를 시작합니다. 행운을 빌어요!'))
+    # 시작 후에는 퍼즐 목록 페이지로 이동시킵니다.
+    return redirect('puzzles')
 
 @require_GET
 def about(request):
@@ -315,6 +358,10 @@ def team(request, team_name):
         messages.error(request, _('Team “{}” not found.').format(team_name))
         return redirect('teams')
 
+    # <시간 수정> 시간 관련 통계(차트 등)의 기준이 되는 시작 시간을 팀의 실제 시작 시간으로 설정합니다.
+    # 만약 팀이 아직 시작하지 않았다면(비정상적인 경우), 전체 헌트 시작 시간을 기준으로 합니다.
+    team_start_time = team.team_start_time if team.team_start_time else HUNT_START_TIME
+
     # This Team.leaderboard_teams() call is expensive, but is
     # the only way right now to calculate rank accurately.
     # Hopefully it is not an issue in practice (especially
@@ -325,6 +372,13 @@ def team(request, team_name):
         if team.id == leaderboard_id:
             rank = i + 1 # ranks are 1-indexed
             break
+
+    # 1. 각 퍼즐별 힌트 사용 횟수를 미리 계산합니다.
+    hint_counts = defaultdict(int)
+    for hint in team.hint_set.all():
+        hint_counts[hint.puzzle_id] += 2
+    for canned_hint in team.cannedhint_set.all():
+        hint_counts[canned_hint.puzzle_id] += 1
 
     guesses = defaultdict(int)
     correct = {}
@@ -345,27 +399,39 @@ def team(request, team_name):
             }
         else:
             guesses[submission.puzzle_id] += 1
+
+    # 2. 헌트 완료 시간을 저장할 변수를 초기화합니다.
+    hunt_completion_time = None
     submissions = []
-    for puzzle in correct:
-        correct[puzzle]['guesses'] = guesses[puzzle]
-        submissions.append(correct[puzzle])
+    for puzzle_id, puzzle_data in correct.items():
+        puzzle_data['guesses'] = guesses[puzzle_id]
+        # 3. 계산해둔 힌트 횟수를 각 퍼즐 데이터에 추가합니다.
+        puzzle_data['hint_count'] = hint_counts[puzzle_id]
+        # 4. 최종 메타 퍼즐을 풀었다면, 그 시간을 헌트 완료 시간으로 기록합니다.
+        if puzzle_data['submission'].puzzle.slug == META_META_SLUG:
+            hunt_completion_time = puzzle_data['solve_time']
+
+        submissions.append(puzzle_data)
     submissions.sort(key=lambda s: s['solve_time'])
-    solves = [HUNT_START_TIME] + [s['solve_time'] for s in submissions]
+
+    # 5. 차트 계산 시 팀의 시작 시간을 사용하도록 수정합니다. (기존 버그 수정)
+    team_start_time = team.team_start_time if team.team_start_time else HUNT_START_TIME
+    solves = [team_start_time] + [s['solve_time'] for s in submissions]
     if solves[-1] >= HUNT_END_TIME:
         solves.append(min(request.context.now, HUNT_CLOSE_TIME))
     else:
         solves.append(HUNT_END_TIME)
     chart = {
-        'hunt_length': (solves[-1] - HUNT_START_TIME).total_seconds(),
+        'hunt_length': (solves[-1] - team_start_time).total_seconds(),
         'solves': [{
-            'before': (solves[i - 1] - HUNT_START_TIME).total_seconds(),
-            'after': (solves[i] - HUNT_START_TIME).total_seconds(),
+            'before': (solves[i - 1] - team_start_time).total_seconds(),
+            'after': (solves[i] - team_start_time).total_seconds(),
         } for i in range(1, len(solves))],
         'metas': [
-            (s['solve_time'] - HUNT_START_TIME).total_seconds()
+            (s['solve_time'] - team_start_time).total_seconds()
             for s in submissions if s['submission'].puzzle.is_meta
         ],
-        'end': (HUNT_END_TIME - HUNT_START_TIME).total_seconds(),
+        'end': (HUNT_END_TIME - team_start_time).total_seconds(),
     }
 
     return render(request, 'team.html', {
@@ -376,6 +442,8 @@ def team(request, team_name):
         'modify_info_available': is_own_team and not request.context.hunt_is_closed,
         'view_info_available': can_view_info,
         'rank': rank,
+        # 6. 계산된 헌트 완료 시간을 템플릿으로 전달합니다.
+        'hunt_completion_time': hunt_completion_time,
     })
 
 def teams_generic(request, hide_hidden):
@@ -1241,33 +1309,31 @@ def wrapup(request):
 @require_GET
 @require_after_hunt_end_or_finished
 def finishers(request):
-    unlocks = OrderedDict()
-    solves = {}
-
-    for submission in AnswerSubmission.objects.filter(
+    # <시간 수정> 해당 함수 전부 수정. finishers data는 헌트 시작-끝 시간 기록함.
+    # 'AnswerSubmission'을 조회할 때 'team' 정보도 함께 가져옵니다. (select_related)
+    # 이제 이 한 번의 쿼리로 필요한 모든 정보를 얻을 수 있습니다.
+    finish_submissions = AnswerSubmission.objects.select_related('team').filter(
         puzzle__slug=META_META_SLUG,
         team__is_hidden=False,
         is_correct=True,
         submitted_datetime__lt=HUNT_END_TIME,
-    ).order_by('submitted_datetime'):
-        unlocks[submission.team_id] = None
-        solves[submission.team_id] = submission
-    for unlock in PuzzleUnlock.objects.select_related().filter(
-        team__id__in=unlocks,
-        puzzle__slug=META_META_SLUG,
-    ).prefetch_related('team__teammember_set'):
-        unlocks[unlock.team_id] = unlock
+    ).order_by('submitted_datetime').prefetch_related('team__teammember_set')
 
     data = []
-    for team_id, unlock in unlocks.items():
+    for submission in finish_submissions:
+        start_time = submission.team.team_start_time
+        solve_time = submission.submitted_datetime
+
         data.append({
-            'team': unlock.team,
-            'unlock_time': unlock.unlock_datetime,
-            'solve_time': solves[team_id].submitted_datetime,
-            'total_time': (solves[team_id].submitted_datetime - unlock.unlock_datetime).total_seconds(),
+            'team': submission.team,
+            'start_time': start_time,
+            'solve_time': solve_time,
+            'total_time': (solve_time - start_time).total_seconds(),
         })
+
     if request.context.is_superuser:
         data.reverse()
+
     return render(request, 'finishers.html', {'data': data})
 
 @require_GET

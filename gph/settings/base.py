@@ -231,12 +231,14 @@ LOGGING = {
         'console_django': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
+            'encoding': 'utf-8',
             'formatter': 'django',
         },
         # puzzles 앱의 로그를 위한 콘솔 핸들러
         'console_puzzles': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
+            'encoding': 'utf-8',
             'formatter': 'puzzles',
         },
     },

@@ -47,8 +47,8 @@ td {
         <td><a href="{% url 'team' team.team.team_name %}">
             {{ team.team.team_name }}
         </a></td>
-        <td sorttable_customkey="{{ team.unlock_time|unix_time }}">
-            {% format_time team.unlock_time "DATE_TIME_FINISHED"%}
+        <td sorttable_customkey="{{ team.start_time|unix_time }}">
+            {% format_time team.start_time "DATE_TIME_FINISHED"%}
         </td>
         <td sorttable_customkey="{{ team.total_time }}">
             {% format_duration team.total_time %}

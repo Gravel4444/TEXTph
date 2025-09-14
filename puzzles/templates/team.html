@@ -58,13 +58,6 @@ main {
     opacity: 0.5;
 }
 
-.free td:last-child:before {
-    content: "(";
-}
-
-.free td:last-child:after {
-    content: ")";
-}
 </style>
 
 <h1>{{ view_team.team_name }}</h1>
@@ -74,18 +67,44 @@ main {
     {% for team_member in view_team.teammember_set.all %}
     {{ team_member.name }}{% if forloop.revcounter != 1 %}, {% endif %}
     {% endfor %}
-    {% if submissions|length %}
-    {% if view_info_available or hunt_is_over %}
     <br><br>
+    
+    {% if view_info_available or hunt_is_over %}
+    <h4>기록</h4>
+    <ul>
+        <li>
+            <strong>시작 시간</strong>
+            {% if view_team.team_start_time %}
+                {% format_time view_team.team_start_time "DATE_AT_TIME" as team_start_time %}
+                : {{ team_start_time }}
+            {% else %}
+                : <small>아직 퍼즐헌트를 시작하기 전입니다. <a href="{% url 'index' %}">메인화면 페이지</a>에서부터 시작하세요.</small>
+            {% endif %}
+        </li>
+        {% if view_team.team_start_time %}
+        <li>
+            <strong>완료 시간</strong>
+            {% if hunt_completion_time %}
+                {% format_time hunt_completion_time "DATE_AT_TIME" as team_completion_time %}
+                : {{ team_completion_time }}
+            {% else %}
+                : <small>아직 퍼즐헌트를 완료하기 전입니다. <a href="{% url 'puzzles' %}">퍼즐 페이지</a>에서부터 이어가세요.</small>
+            {% endif %}
+        </li>
+        {% endif %}
+    </ul>
+    {% if submissions|length %}
     <table class="sortable list-table">
-        <col style="width: 35%">
-        <col style="width: 15%">
+        <col>
+        <col>
+        <col>
         <col style="width: 18%">
         <col style="width: 14%">
         <col style="width: 18%">
         <tr>
             <th>{% translate "Puzzle" %}</th>
             <th>{% translate "Incorrect guesses" %}</th>
+            <th>✏️<b>연필</b> 사용량</th>
             <th>{% translate "Unlock time" %}</th>
             <th>{% translate "Time to solve" %}</th>
             <th>{% translate "Solve time" %}</th>
@@ -95,7 +114,8 @@ main {
             <td sorttable_customkey="{{ s.submission.puzzle.name }}"{% if s.submission.puzzle.is_meta %} class="meta-stats"{% endif %}>
                 <a href="{% url 'puzzle' s.submission.puzzle.slug %}">{{ s.submission.puzzle.name }}</a>
             </td>
-            <td>{{ s.guesses }}</td>
+            <td style="text-align: center;">{{ s.guesses }}</td>
+            <td style="text-align: center;">{{ s.hint_count }}</td>
             <td sorttable_customkey="{{ s.unlock_time|unix_time }}">{% format_time s.unlock_time %}</td>
             <td sorttable_customkey="{{ s.open_duration }}">{% format_duration s.open_duration %}</td>
             <td sorttable_customkey="{{ s.solve_time|unix_time }}">{% format_time s.solve_time %}</td>
