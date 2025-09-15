@@ -279,20 +279,28 @@ HUNT_START_TIME = timezone.make_aware(datetime.datetime(
     year=2025,
     month=10,
     day=7,
-    hour=22,
+    hour=19,
     minute=00,
-), timezone=datetime.timezone(datetime.timedelta(hours=11)))
+), timezone=datetime.timezone(datetime.timedelta(hours=9)))
 HUNT_END_TIME = timezone.make_aware(datetime.datetime(
     year=2030,
     month=10,
     day=9,
-    hour=4,
-    minute=0,
-), timezone=datetime.timezone(datetime.timedelta(hours=11)))
+    hour=18,
+    minute=59,
+), timezone=datetime.timezone(datetime.timedelta(hours=9)))
 HUNT_CLOSE_TIME = timezone.make_aware(datetime.datetime(
     year=2030,
     month=10,
     day=9,
-    hour=4,
-    minute=1,
-), timezone=datetime.timezone(datetime.timedelta(hours=11)))
+    hour=19,
+    minute=00,
+), timezone=datetime.timezone(datetime.timedelta(hours=9)))
+
+REQUESTING_HINT_END_TIME = timezone.make_aware(datetime.datetime(
+    year=2025,
+    month=10,
+    day=21,
+    hour=23,
+    minute=59,
+), timezone=datetime.timezone(datetime.timedelta(hours=9)))

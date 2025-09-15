@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from puzzles import hunt_config
-from puzzles.hunt_config import HUNT_START_TIME, HUNT_END_TIME, HUNT_CLOSE_TIME, META_META_SLUG
+from puzzles.hunt_config import HUNT_START_TIME, HUNT_END_TIME, HUNT_CLOSE_TIME, META_META_SLUG, REQUESTING_HINT_END_TIME
 from puzzles import models
 from puzzles.shortcuts import get_shortcuts
 
@@ -115,6 +115,10 @@ class BaseContext:
     # 팀이 존재하고, 그 팀의 시작 시간이 설정되어 있으면 True를 반환합니다.
     def team_has_started(self):
         return self.team and self.team.team_start_time
+    
+    # <힌트 수정> 함수 새로 추가. 힌트 요청 가능한지 아닌지
+    def requesting_hint_is_over(self):
+        return self.now >= REQUESTING_HINT_END_TIME
 
 # Also include the constants from hunt_config.
 for (key, value) in hunt_config.__dict__.items():

@@ -52,7 +52,7 @@
         <li>현재 ✏️<b>연필 {{ team.num_hints_remaining }}개</b>가 있습니다.</li>
         {% endif %}
         <li>고정된 힌트를 보는 데에는 ✏️<b>연필 1개</b>, 힌트를 요청하는 데에는 ✏️<b>연필 2개</b>가 사용됩니다.</li>
-        <li>자세한 내용은 <a href="{{ about }}#Hints">소개 페이지</a>를 참고하세요.</li>
+        <li>자세한 내용은 <a href="{% url 'about' %}#Hints">소개 페이지</a>를 참고하세요.</li>
     </ul>
 
     <!-- 개별화된 힌트 -->
@@ -81,7 +81,7 @@
     </ul>
 
     <h4>{% translate "Request a hint" %}</h4>
-    <ul><li>팀의 진행상황에 따라 적절한 힌트를 요청할 수 있습니다. ✏️<b>연필 2개</b>가 소모됩니다.</li></ul>
+    <ul style="margin-bottom: 1rem;"><li>팀의 진행상황에 따라 적절한 힌트를 요청할 수 있습니다. ✏️<b>연필 2개</b>가 소모됩니다.</li></ul>
     {% if error %}
     <p class="hint-error">{{ error|safe }}</p>
     {% endif %}

@@ -14,7 +14,7 @@ IS_TEST = False
 # ===============================================================
 # DOMAIN: 나중에 Heroku 앱 주소로 변경하세요 (예: 'https://your-app-name.herokuapp.com/')
 # 이 설정은 이메일 링크 등에서 전체 URL을 생성할 때 사용됩니다.
-DOMAIN = 'https://koreapuzzlehunt.fly.dev'
+DOMAIN = 'fixme'
 
 # ALLOWED_HOSTS: Heroku가 사용하는 도메인을 허용합니다.
 # 나중에는 ['your-app-name.herokuapp.com'] 처럼 특정 도메인만 지정하는 것이 더 안전합니다.

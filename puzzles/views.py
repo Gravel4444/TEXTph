@@ -70,6 +70,8 @@ from puzzles.hunt_config import (
     ONE_HINT_AT_A_TIME,
     INTRO_ROUND_SLUG,
     META_META_SLUG,
+    # 힌트 요청 끝나는 시간 추가
+    REQUESTING_HINT_END_TIME,
 )
 
 from puzzles.messaging import send_mail_wrapper, dispatch_victory_alert, show_victory_notification
@@ -925,7 +927,10 @@ def hints(request):
 
     error = None
     if request.context.hunt_is_over:
-        error = _('Sorry, hints are closed.')
+        error = _('퍼즐헌트가 끝났습니다.')
+        can_followup = False
+    elif request.context.requesting_hint_is_over:
+        error = _('힌트 요청은 더이상 불가능합니다. 고정된 힌트를 사용해보세요.')
         can_followup = False
     elif team.num_hints_remaining <= 1 and team.num_free_answers_remaining <= 1:
         error = _('✏️<strong>연필</strong>이 부족합니다!')

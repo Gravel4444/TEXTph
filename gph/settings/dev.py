@@ -13,10 +13,10 @@ EMAIL_SUBJECT_PREFIX = ''
 HUNT_START_TIME = timezone.make_aware(datetime.datetime(
     year=2025,
     month=9,
-    day=1,
-    hour=0,
-    minute=0,
-))
+    day=15,
+    hour=13,
+    minute=37,
+), timezone=datetime.timezone(datetime.timedelta(hours=9)))
 
 STATIC_ROOT = 'static'
 

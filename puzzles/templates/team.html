@@ -77,6 +77,9 @@ main {
             {% if view_team.team_start_time %}
                 {% format_time view_team.team_start_time "DATE_AT_TIME" as team_start_time %}
                 : {{ team_start_time }}
+            {% elif not hunt_has_started %}
+                {% format_time start_time "DATE_AT_TIME" as hunt_start_time %}
+                : <small>아직 퍼즐헌트가 시작되지 않았습니다. {{ hunt_start_time }}을 기대해주세요.</small>
             {% else %}
                 : <small>아직 퍼즐헌트를 시작하기 전입니다. <a href="{% url 'index' %}">메인화면 페이지</a>에서부터 시작하세요.</small>
             {% endif %}

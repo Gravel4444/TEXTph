@@ -3,11 +3,12 @@
     {% for data in round.puzzles %}
     <tr>
         <td>
+            {% if data.new %}
+                <div class="puzzles-new">{% translate "new!" %}</div>
+            {% endif %}
             {% if data.puzzle.is_meta %}
                 <div class="puzzles-new">{% translate "meta" %}</div>
-                {% elif data.new %}
-                <div class="puzzles-new">{% translate "new!" %}</div>
-                {% endif %}
+            {% endif %}
             &nbsp;
             {{ data.puzzle.order }}
         </td>
